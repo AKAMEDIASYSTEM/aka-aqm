@@ -1,0 +1,9 @@
+[Unit]
+Description=AKA eink weather checker timer
+
+[Timer]
+OnUnitActiveSec=600s
+OnBootSec=10s
+
+[Install]
+WantedBy=timers.target

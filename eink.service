@@ -1,0 +1,11 @@
+[Unit]
+Description=AKA eink weather checker
+
+[Service]
+ExecStart=/usr/bin/python3 /home/pi/aka-aqm/main.py
+RestartSec=30
+Restart=always
+User=pi
+
+[Install]
+WantedBy=multi-user.target
