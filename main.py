@@ -1,5 +1,4 @@
 #! /usr/bin/python3
-
 """
 Query Open Weather API and AHT20 qwiic sensor.
 Display results on eInk bonnet.
@@ -31,7 +30,7 @@ bus = smbus.SMBus(1)
 i2c = busio.I2C(board.SCL, board.SDA)
 aht20 = adafruit_ahtx0.AHTx0(i2c)
 
-if len(ak["OPEN_WEATHER_TOKEN"]) == 0:
+if ak["OPEN_WEATHER_TOKEN"] == "DUMMY_VALUE":
     raise RuntimeError(
         "You need to set your token first. If you don't already have one, you can register for a free account at https://home.openweathermap.org/users/sign_up"
     )
@@ -63,14 +62,12 @@ def get_reading():
     # payload = bus.read_i2c_block_data(address, 0, msg_len)
     payload = bytearray(msg_len)
     i2c.readfrom_into(address, payload)
-    # print(payload)
     reading['aqiA'] = collapse(payload[0:4])
     reading['aqiB'] = collapse(payload[5:9])
     reading['pm25A'] = collapse(payload[10:14])
     reading['pm25B'] = collapse(payload[15:19])
     reading['pm4A'] = collapse(payload[20:24])
     reading['pm4B'] = collapse(payload[25:29])
-    # print(reading)
     return -1
 
 
@@ -98,8 +95,8 @@ while True:
             tomp['pm25B'] = reading['pm25B']
             tomp['pm4A'] = reading['pm4A']
             tomp['pm4B'] = reading['pm4B']
-            print("Response is", tomp)
-            # print("TOMP is", tomp)
+            if ak["VERBOSE"]:
+                print("Response is", tomp)
             gfx.display_weather(json.dumps(tomp))
             weather_refresh = time.monotonic()
         else:
@@ -113,9 +110,7 @@ while True:
         tomp['pm25B'] = reading['pm25B']
         tomp['pm4A'] = reading['pm4A']
         tomp['pm4B'] = reading['pm4B']
-        print("Response is", tomp)
-
-    # gfx.update_time()
+        if ak["VERBOSE"]:
+            print("Response is", tomp)
     gfx.display_weather(json.dumps(tomp))
-    # break
-    time.sleep(61)  # wait 1+ minute before updating anything again, so the minutes-digit is sure to update
+    time.sleep(60)  # wait 1+ minute before updating anything again, so the minutes-digit is sure to update

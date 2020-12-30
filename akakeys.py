@@ -3,5 +3,6 @@ ak = {
     "OPEN_WEATHER_TOKEN": "DUMMY_VALUE",
     "LOCATION": "DUMMY_VALUE",
     "DATA_SOURCE_URL": "http://api.openweathermap.org/data/2.5/weather",
-    "REFRESH_INTERVAL": 600
+    "REFRESH_INTERVAL": 600,
+    "VERBOSE": True
 }
