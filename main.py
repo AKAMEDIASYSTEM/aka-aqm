@@ -17,7 +17,7 @@ from adafruit_epd.ssd1675 import Adafruit_SSD1675
 from weather_graphics import Weather_Graphics
 import adafruit_ahtx0
 import json
-from akakeys import ak
+from akakeysreal import ak
 
 
 spi = busio.SPI(board.SCK, MOSI=board.MOSI, MISO=board.MISO)
@@ -29,6 +29,9 @@ busy = digitalio.DigitalInOut(board.D17)
 bus = smbus.SMBus(1)
 i2c = busio.I2C(board.SCL, board.SDA)
 aht20 = adafruit_ahtx0.AHTx0(i2c)
+
+teensy_msg_len = 29  # our teensy code always sends fixed-len response
+teensy_address = 0x77
 
 if ak["OPEN_WEATHER_TOKEN"] == "DUMMY_VALUE":
     raise RuntimeError(
@@ -50,6 +53,17 @@ gfx = Weather_Graphics(display, am_pm=True, celsius=False)
 weather_refresh = None
 reading = {}
 tomp = {}
+SAMPLE_DEPTH = 60 * 12  # number of minutes of data to retain, here we choose 12hrs
+
+
+def init_readings():
+    """Fill sample buffer with zeroes."""
+    reading['aqiA'] = [0] * SAMPLE_DEPTH
+    reading['aqiB'] = [0] * SAMPLE_DEPTH
+    reading['pm25A'] = [0] * SAMPLE_DEPTH
+    reading['pm25B'] = [0] * SAMPLE_DEPTH
+    reading['pm4A'] = [0] * SAMPLE_DEPTH
+    reading['pm4B'] = [0] * SAMPLE_DEPTH
 
 
 def get_reading():
@@ -57,17 +71,18 @@ def get_reading():
     # Write out I2C command: address, reg_write_dac, msg[0], msg[1]
     # msg = random.getrandbits(8)
     # bus.write_byte_data(address, reg_write_datareq, msg)
-    msg_len = 29  # our teensy code always sends fixed-len response
-    address = 0x77
+
     # payload = bus.read_i2c_block_data(address, 0, msg_len)
-    payload = bytearray(msg_len)
-    i2c.readfrom_into(address, payload)
-    reading['aqiA'] = collapse(payload[0:4])
-    reading['aqiB'] = collapse(payload[5:9])
-    reading['pm25A'] = collapse(payload[10:14])
-    reading['pm25B'] = collapse(payload[15:19])
-    reading['pm4A'] = collapse(payload[20:24])
-    reading['pm4B'] = collapse(payload[25:29])
+    payload = bytearray(teensy_msg_len)
+    i2c.readfrom_into(teensy_address, payload)
+    for i in reading:
+        reading[i].pop(0)
+    reading['aqiA'].append(collapse(payload[0:4]))
+    reading['aqiB'].append(collapse(payload[5:9]))
+    reading['pm25A'].append(collapse(payload[10:14]))
+    reading['pm25B'].append(collapse(payload[15:19]))
+    reading['pm4A'].append(collapse(payload[20:24]))
+    reading['pm4B'].append(collapse(payload[25:29]))
     return -1
 
 
@@ -79,6 +94,7 @@ def collapse(intlist):
     return int(f)
 
 
+init_readings()
 while True:
     get_reading()
     # only query the weather every 10 minutes (and on first run)
