@@ -78,12 +78,12 @@ class Weather_Graphics:
             self._ttmp = float(weather['ttmp'])
         else:
             self._ttmp = (float(weather['ttmp']) * 9 / 5 + 32)
-        self._aqiA = weather['aqiA']
-        self._aqiB = weather['aqiB']
-        self._pm25A = weather['pm25A']
-        self._pm25B = weather['pm25B']
-        self._pm4A = weather['pm4A']
-        self._pm4B = weather['pm4B']
+        self._aqiA = weather['aqiA'][-1]
+        self._aqiB = weather['aqiB'][-1]
+        self._pm25A = weather['pm25A'][-1]
+        self._pm25B = weather['pm25B'][-1]
+        self._pm4A = weather['pm4A'][-1]
+        self._pm4B = weather['pm4B'][-1]
         # set the icon/background
         self._weather_icon = ICON_MAP[weather["weather"][0]["icon"]]
 
