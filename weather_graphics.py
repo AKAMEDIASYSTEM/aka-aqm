@@ -1,4 +1,4 @@
-"""Graphics class."""
+"""Graphics class for EInk display. Display is 250 wide and 122 tall."""
 from datetime import datetime
 import json
 import random
@@ -154,13 +154,13 @@ class Weather_Graphics:
         )
 
         # Draw the Description, big
-        # (font_width, font_height) = small_font.getsize(self._description)
-        # draw.text(
-        #     (self.display.width - font_width - 5, self.display.height - font_height * 2),
-        #     self._description,
-        #     font=self.small_font,
-        #     fill=BLACK,
-        # )
+        (font_width, font_height) = small_font.getsize(self._description)
+        draw.text(
+            (self.display.width - font_width - 5, self.display.height - font_height * 4),
+            self._description,
+            font=self.small_font,
+            fill=BLACK,
+        )
 
         # AKA added this to display local AHT20 values
         draw.text(
@@ -210,12 +210,14 @@ class Weather_Graphics:
             font=self.small_font,
             fill=BLACK,
         )
-        print(self._aA)
         ra = max(self._aA) - min(self._aA)
         # bb = random.sample(range(rangee), self.display.width - 1)
         sc = (self.gheight / ra)
+        print(self.display.width)
+        print(self.display.height)
         for i, j in enumerate(self._aA):
             # [x1, y1, x2, y2]
+            # print("scaled {}".format(round(self.display.height - (j * sc))))
             draw.line([i, self.display.height, i, round(self.display.height - (j * sc))], fill=BLACK)
 
         self.display.image(image)

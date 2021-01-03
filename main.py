@@ -53,7 +53,7 @@ gfx = Weather_Graphics(display, am_pm=True, celsius=False)
 weather_refresh = None
 reading = {}
 tomp = {}
-SAMPLE_DEPTH = 60 * 12  # number of minutes of data to retain, here we choose 12hrs
+SAMPLE_DEPTH = 250  # number of minutes of data to retain, here we choose 250mins, width of eink display
 
 
 def init_readings():
