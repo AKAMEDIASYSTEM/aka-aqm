@@ -83,7 +83,6 @@ def get_reading():
     reading['pm25B'].append(collapse(payload[15:19]))
     reading['pm4A'].append(collapse(payload[20:24]))
     reading['pm4B'].append(collapse(payload[25:29]))
-    return -1
 
 
 def collapse(intlist):

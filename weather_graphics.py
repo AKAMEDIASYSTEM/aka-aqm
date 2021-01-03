@@ -1,5 +1,7 @@
+"""Graphics class."""
 from datetime import datetime
 import json
+import random
 from PIL import Image, ImageDraw, ImageFont
 from adafruit_epd.epd import Adafruit_EPD
 import statistics
@@ -42,7 +44,10 @@ BLACK = (0, 0, 0)
 
 
 class Weather_Graphics:
+    """GFX Class."""
+
     def __init__(self, display, *, am_pm=True, celsius=True):
+        """Init, innit."""
         self.am_pm = am_pm
         self.celsius = celsius
 
@@ -51,6 +56,7 @@ class Weather_Graphics:
         self.large_font = large_font
 
         self.display = display
+        self.gheight = round(self.display.height / 4)
 
         self._weather_icon = None
         self._city_name = None
@@ -69,10 +75,11 @@ class Weather_Graphics:
         self._pm4B = None
 
     def display_weather(self, weather):
+        """Display all the weather, not just time."""
         weather = json.loads(weather)
         # print(weather)
         # AKA added values from AHT20 as thum and ttmp
-        # AKA added values from dual HPM particulate sensor 
+        # AKA added values from dual HPM particulate sensor
         self._thum = weather['thum']
         if self.celsius:
             self._ttmp = float(weather['ttmp'])
@@ -84,6 +91,8 @@ class Weather_Graphics:
         self._pm25B = weather['pm25B'][-1]
         self._pm4A = weather['pm4A'][-1]
         self._pm4B = weather['pm4B'][-1]
+        # experiment in showing all of timeseries
+        self._aA = weather['aqiA']
         # set the icon/background
         self._weather_icon = ICON_MAP[weather["weather"][0]["icon"]]
 
@@ -111,11 +120,13 @@ class Weather_Graphics:
         self.update_time()
 
     def update_time(self):
+        """Display updates just time."""
         now = datetime.now()
         self._time_text = now.strftime("%I:%M %p").lstrip("0").replace(" 0", " ")
         self.update_display()
 
     def update_display(self):
+        """Display all the stuff, not just time."""
         self.display.fill(Adafruit_EPD.WHITE)
         image = Image.new("RGB", (self.display.width, self.display.height), color=WHITE)
         draw = ImageDraw.Draw(image)
@@ -143,13 +154,13 @@ class Weather_Graphics:
         )
 
         # Draw the Description, big
-        (font_width, font_height) = small_font.getsize(self._description)
-        draw.text(
-            (self.display.width - font_width - 5, self.display.height - font_height * 2),
-            self._description,
-            font=self.small_font,
-            fill=BLACK,
-        )
+        # (font_width, font_height) = small_font.getsize(self._description)
+        # draw.text(
+        #     (self.display.width - font_width - 5, self.display.height - font_height * 2),
+        #     self._description,
+        #     font=self.small_font,
+        #     fill=BLACK,
+        # )
 
         # AKA added this to display local AHT20 values
         draw.text(
@@ -199,6 +210,13 @@ class Weather_Graphics:
             font=self.small_font,
             fill=BLACK,
         )
+        print(self._aA)
+        ra = max(self._aA) - min(self._aA)
+        # bb = random.sample(range(rangee), self.display.width - 1)
+        sc = (self.gheight / ra)
+        for i, j in enumerate(self._aA):
+            # [x1, y1, x2, y2]
+            draw.line([i, self.display.height, i, round(self.display.height - (j * sc))], fill=BLACK)
 
         self.display.image(image)
         self.display.display()
