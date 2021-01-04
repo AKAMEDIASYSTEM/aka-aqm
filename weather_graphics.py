@@ -164,50 +164,50 @@ class Weather_Graphics:
 
         # AKA added this to display local AHT20 values
         draw.text(
-            (self.display.width - 85, 5), "{:.01f}".format(self._ttmp) + "ºF", font=self.medium_font, fill=BLACK,
+            (self.display.width - 85, 5), "{:.0f}".format(self._ttmp) + "ºF", font=self.medium_font, fill=BLACK,
         )
         # AKA added this to display local AHT20 values
         draw.text(
-            (self.display.width - 85, 25), self._thum + "%h", font=self.medium_font, fill=BLACK,
+            (self.display.width - 85, 25), self._thum + "%", font=self.medium_font, fill=BLACK,
         )
 
         # Draw the AQI and average PPMs
-        aqi_str = "AQI: {}".format(int(statistics.mean([self._aqiA, self._aqiB])))
-        (font_width, font_height) = small_font.getsize(aqi_str)
+        aqi_str = "aqi: {}".format(int(statistics.mean([self._aqiA, self._aqiB])))
+        (font_width, font_height) = medium_font.getsize(aqi_str)
         draw.text(
             (
                 # self.display.width - font_width - 5,
-                5,
-                font_height * 2,
+                0,
+                25,
             ),
             aqi_str,
-            font=self.small_font,
+            font=self.medium_font,
             fill=BLACK,
         )
         # Draw the ppm averages
-        ppm4_str = "ppm4: {}".format(int(statistics.mean([self._pm4A, self._pm4B])))
-        (font_width, font_height) = small_font.getsize(ppm4_str)
+        ppm4_str = "4: {}".format(int(statistics.mean([self._pm4A, self._pm4B])))
+        (font_width, font_height) = medium_font.getsize(ppm4_str)
         draw.text(
             (
                 # self.display.width - font_width - 5,
-                5,
-                font_height * 3,
+                0,
+                25 + font_height,
             ),
             ppm4_str,
-            font=self.small_font,
+            font=self.medium_font,
             fill=BLACK,
         )
 
-        ppm25_str = "ppm25 {}".format(int(statistics.mean([self._pm25A, self._pm25B])))
-        (font_width, font_height) = small_font.getsize(ppm25_str)
+        ppm25_str = "2.5: {}".format(int(statistics.mean([self._pm25A, self._pm25B])))
+        (font_width, font_height) = medium_font.getsize(ppm25_str)
         draw.text(
             (
                 # self.display.width - font_width - 5,
-                5,
-                font_height * 4,
+                0,
+                25 + (font_height * 2),
             ),
             ppm25_str,
-            font=self.small_font,
+            font=self.medium_font,
             fill=BLACK,
         )
         ra = max(self._aA) - min(self._aA)

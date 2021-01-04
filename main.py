@@ -103,7 +103,7 @@ while True:
             value = response.read()
             tomp = json.loads(value)
             tomp['ttmp'] = "{:.01f}".format(aht20.temperature)
-            tomp['thum'] = "{:.01f}".format(aht20.relative_humidity)
+            tomp['thum'] = "{:.0f}".format(aht20.relative_humidity)
             tomp['aqiA'] = reading['aqiA']
             tomp['aqiB'] = reading['aqiB']
             tomp['pm25A'] = reading['pm25A']
