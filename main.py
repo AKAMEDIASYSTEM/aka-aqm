@@ -94,6 +94,23 @@ def collapse(intlist):
 
 
 init_readings()
+
+'''
+BUTTONS AVAILABLE:
+import digitalio
+ 
+up_button = digitalio.DigitalInOut(board.D5)
+up_button.switch_to_input()
+down_button = digitalio.DigitalInOut(board.D6)
+down_button.switch_to_input()
+
+if not up_button.value:
+    print("Up Button Pushed")
+ 
+if not down_button.value:
+    print("Down Button Pushed")
+'''
+
 while True:
     get_reading()
     # only query the weather every 10 minutes (and on first run)
@@ -112,13 +129,13 @@ while True:
             tomp['pm4B'] = reading['pm4B']
             if ak["VERBOSE"]:
                 print("Response is", tomp)
-            gfx.display_weather(json.dumps(tomp))
+            # gfx.display_weather(json.dumps(tomp))
             weather_refresh = time.monotonic()
         else:
             print("Unable to retrieve data at {}".format(data_source))
     else:
         tomp['ttmp'] = "{:.01f}".format(aht20.temperature)
-        tomp['thum'] = "{:.01f}".format(aht20.relative_humidity)
+        tomp['thum'] = "{:.0f}".format(aht20.relative_humidity)
         tomp['aqiA'] = reading['aqiA']
         tomp['aqiB'] = reading['aqiB']
         tomp['pm25A'] = reading['pm25A']

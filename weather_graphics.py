@@ -74,6 +74,12 @@ class Weather_Graphics:
         self._pm4A = None
         self._pm4B = None
 
+    def mapval(self, val, start1, stop1, start2, stop2):
+        """Equivalent of linear interpolate between two ranges."""
+        d = start2 + (stop2 - start2) * ((val - start1) / (stop1 - start1))
+        # print(d)
+        return d
+
     def display_weather(self, weather):
         """Display all the weather, not just time."""
         weather = json.loads(weather)
@@ -135,9 +141,10 @@ class Weather_Graphics:
         (font_width, font_height) = icon_font.getsize(self._weather_icon)
         draw.text(
             (
-                self.display.width // 2 - font_width // 2,
+                self.display.width - font_width - 60,
+                # self.display.width // 2 - font_width // 2,
                 # self.display.height // 2 - font_height // 2 - 5,
-                5,
+                0,
             ),
             self._weather_icon,
             font=icon_font,
@@ -164,11 +171,11 @@ class Weather_Graphics:
 
         # AKA added this to display local AHT20 values
         draw.text(
-            (self.display.width - 85, 5), "{:.0f}".format(self._ttmp) + "ºF", font=self.medium_font, fill=BLACK,
+            (self.display.width - 45, 5), "{:.0f}".format(self._ttmp) + "ºF", font=self.medium_font, fill=BLACK,
         )
         # AKA added this to display local AHT20 values
         draw.text(
-            (self.display.width - 85, 25), self._thum + "%", font=self.medium_font, fill=BLACK,
+            (self.display.width - 45, 25), self._thum + "%", font=self.medium_font, fill=BLACK,
         )
 
         # Draw the AQI and average PPMs
@@ -210,15 +217,26 @@ class Weather_Graphics:
             font=self.medium_font,
             fill=BLACK,
         )
-        ra = max(self._aA) - min(self._aA)
+
+        # Draw the timeseries
+        # ra = max(self._aA) - min(self._aA)
         # bb = random.sample(range(rangee), self.display.width - 1)
-        sc = (self.gheight / ra)
-        print(self.display.width)
-        print(self.display.height)
+        # sc = (self.gheight / ra)
+        # print("sc is {}.".format(sc))
+        # print(self.display.height)
         for i, j in enumerate(self._aA):
             # [x1, y1, x2, y2]
-            # print("scaled {}".format(round(self.display.height - (j * sc))))
-            draw.line([i, self.display.height, i, round(self.display.height - (j * sc))], fill=BLACK)
+            # this used to be a dynamic Y axis, scaled between min(aA) and max(aA)
+            # but that is less usable over time, and introduced a strange accumulation error
+            # I stopped trying to debug :-(
+            lheight = round(self.mapval(j, 0, 1000, self.display.height, (self.display.height * 0.75)))
+            print(lheight)
+            draw.line([i, self.display.height, i, lheight], fill=BLACK)
+
+        # draw the 15-min ticks
+        for i in range(int(self.display.width / 15)):
+            vert = (self.display.width - i * 15)
+            draw.line([vert, self.display.height, vert, self.display.height - self.gheight], fill=WHITE)
 
         self.display.image(image)
         self.display.display()
