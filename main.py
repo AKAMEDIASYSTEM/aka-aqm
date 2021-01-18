@@ -98,7 +98,7 @@ init_readings()
 '''
 BUTTONS AVAILABLE:
 import digitalio
- 
+
 up_button = digitalio.DigitalInOut(board.D5)
 up_button.switch_to_input()
 down_button = digitalio.DigitalInOut(board.D6)
@@ -106,7 +106,7 @@ down_button.switch_to_input()
 
 if not up_button.value:
     print("Up Button Pushed")
- 
+
 if not down_button.value:
     print("Down Button Pushed")
 '''
@@ -115,24 +115,32 @@ while True:
     get_reading()
     # only query the weather every 10 minutes (and on first run)
     if (not weather_refresh) or (time.monotonic() - weather_refresh) > ak["REFRESH_INTERVAL"]:
-        response = urllib.request.urlopen(data_source)
-        if response.getcode() == 200:
-            value = response.read()
-            tomp = json.loads(value)
-            tomp['ttmp'] = "{:.01f}".format(aht20.temperature)
-            tomp['thum'] = "{:.0f}".format(aht20.relative_humidity)
-            tomp['aqiA'] = reading['aqiA']
-            tomp['aqiB'] = reading['aqiB']
-            tomp['pm25A'] = reading['pm25A']
-            tomp['pm25B'] = reading['pm25B']
-            tomp['pm4A'] = reading['pm4A']
-            tomp['pm4B'] = reading['pm4B']
-            if ak["VERBOSE"]:
-                print("Response is", tomp)
-            # gfx.display_weather(json.dumps(tomp))
-            weather_refresh = time.monotonic()
+        try:
+            response = urllib.request.urlopen(data_source)
+        except urllib.HTTPError as e:
+            # do something
+            print('Error code: ', e.code)
+        except urllib.URLError as e:
+            # do something
+            print('Reason: ', e.reason)
         else:
-            print("Unable to retrieve data at {}".format(data_source))
+            if response.getcode() == 200:
+                value = response.read()
+                tomp = json.loads(value)
+                tomp['ttmp'] = "{:.01f}".format(aht20.temperature)
+                tomp['thum'] = "{:.0f}".format(aht20.relative_humidity)
+                tomp['aqiA'] = reading['aqiA']
+                tomp['aqiB'] = reading['aqiB']
+                tomp['pm25A'] = reading['pm25A']
+                tomp['pm25B'] = reading['pm25B']
+                tomp['pm4A'] = reading['pm4A']
+                tomp['pm4B'] = reading['pm4B']
+                if ak["VERBOSE"]:
+                    print("Response is", tomp)
+                # gfx.display_weather(json.dumps(tomp))
+                weather_refresh = time.monotonic()
+            else:
+                print("Unable to retrieve data at {}".format(data_source))
     else:
         tomp['ttmp'] = "{:.01f}".format(aht20.temperature)
         tomp['thum'] = "{:.0f}".format(aht20.relative_humidity)
