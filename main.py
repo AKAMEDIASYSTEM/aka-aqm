@@ -117,12 +117,14 @@ while True:
     if (not weather_refresh) or (time.monotonic() - weather_refresh) > ak["REFRESH_INTERVAL"]:
         try:
             response = urllib.request.urlopen(data_source)
-        except urllib.HTTPError as e:
+        except urllib.error.HTTPError as e:
             # do something
-            print('Error code: ', e.code)
-        except urllib.URLError as e:
+            if ak["VERBOSE"]:
+                print('urllib.request Error code: ', e.code)
+        except urllib.error.URLError as e:
             # do something
-            print('Reason: ', e.reason)
+            if ak["VERBOSE"]:
+                print('Reason: ', e.reason)
         else:
             if response.getcode() == 200:
                 value = response.read()
@@ -136,11 +138,12 @@ while True:
                 tomp['pm4A'] = reading['pm4A']
                 tomp['pm4B'] = reading['pm4B']
                 if ak["VERBOSE"]:
-                    print("Response is", tomp)
+                    print("Web-fetched this time, tomp is: ", tomp)
                 # gfx.display_weather(json.dumps(tomp))
                 weather_refresh = time.monotonic()
             else:
-                print("Unable to retrieve data at {}".format(data_source))
+                if ak["VERBOSE"]:
+                    print("Unable to retrieve data at {}".format(data_source))
     else:
         tomp['ttmp'] = "{:.01f}".format(aht20.temperature)
         tomp['thum'] = "{:.0f}".format(aht20.relative_humidity)
@@ -151,6 +154,6 @@ while True:
         tomp['pm4A'] = reading['pm4A']
         tomp['pm4B'] = reading['pm4B']
         if ak["VERBOSE"]:
-            print("Response is", tomp)
+            print("No web fetch this time, tomp is: ", tomp)
     gfx.display_weather(json.dumps(tomp))
     time.sleep(60)  # wait 1+ minute before updating anything again, so the minutes-digit is sure to update

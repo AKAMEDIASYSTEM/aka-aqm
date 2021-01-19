@@ -219,18 +219,12 @@ class Weather_Graphics:
         )
 
         # Draw the timeseries
-        # ra = max(self._aA) - min(self._aA)
-        # bb = random.sample(range(rangee), self.display.width - 1)
-        # sc = (self.gheight / ra)
-        # print("sc is {}.".format(sc))
-        # print(self.display.height)
         for i, j in enumerate(self._aA):
             # [x1, y1, x2, y2]
             # this used to be a dynamic Y axis, scaled between min(aA) and max(aA)
             # but that is less usable over time, and introduced a strange accumulation error
             # I stopped trying to debug :-(
             lheight = round(self.mapval(j, 0, 1000, self.display.height, (self.display.height * 0.75)))
-            print(lheight)
             draw.line([i, self.display.height, i, lheight], fill=BLACK)
 
         # draw the 15-min ticks
