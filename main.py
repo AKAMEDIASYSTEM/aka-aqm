@@ -49,7 +49,7 @@ display = Adafruit_SSD1675(
 
 display.rotation = 1
 
-gfx = Weather_Graphics(display, am_pm=True, celsius=False)
+gfx = Weather_Graphics(display, am_pm=True, celsius=ak["USE_PROPER_UNITS_NOT_FAHRENHEIT"])
 weather_refresh = None
 reading = {}
 tomp = {}
